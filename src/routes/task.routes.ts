@@ -3,4 +3,4 @@ import { taskControllers } from "../controllers/taskControllers";
 
 export const taskRoutes = Router();
 
-taskRoutes.get("/tasks", taskControllers.read);
+taskRoutes.get("/tasks", taskControllers.create);
