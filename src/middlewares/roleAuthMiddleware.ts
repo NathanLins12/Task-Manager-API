@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { userRepositorie } from "../repositories/userRepositories";
+import { userRepositorie } from "../repositories/userRepository";
 
 type Roles = "admin" | "default";
 
