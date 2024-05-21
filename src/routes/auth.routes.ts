@@ -4,4 +4,4 @@ import { authControllers } from "../controllers/authControllers";
 
 export const authRoutes = Router();
 
-authRoutes.get("/", authControllers.login);
+authRoutes.get("/login", authControllers.login);
