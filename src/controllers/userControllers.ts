@@ -12,7 +12,8 @@ export const userControllers = {
         { name, email, password },
         userRepository
       );
-      return res.status(201).json({ message: "User created!" });
+
+      return res.status(201).json({ message: "user created!", userCreated });
     } catch (error) {
       return next(error);
     }
