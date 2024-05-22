@@ -33,4 +33,4 @@ export const taskSchema = z
   })
   .strict();
 
-export type UserDataType = z.infer<typeof taskSchema>;
+export type TaskDataType = z.infer<typeof taskSchema>;
