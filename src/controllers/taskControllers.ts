@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { taskSchema } from "../validations/taskSchema";
 import { taskServices } from "../services/taskServices";
 import { taskRepository } from "../repositories/taskRepository";
+import { paginationSchema } from "../validations/paginationSchema";
 
 export const taskControllers = {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -19,7 +20,28 @@ export const taskControllers = {
 
       const taskCreated = await taskServices.create(task, taskRepository);
 
-      return res.status(200).json({ message: "Tasks!", taskCreated });
+      return res.status(201).json({ message: "task created!", taskCreated });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async read(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userID = req.userID;
+      const { limit, offset, filter } = paginationSchema.parse(req.query);
+
+      const userTasks = await taskServices.read(
+        {
+          userID,
+          limit,
+          offset,
+          filter,
+        },
+        taskRepository
+      );
+
+      return res.status(200).json({ message: "task readed!", userTasks });
     } catch (error) {
       return next(error);
     }
@@ -45,7 +67,7 @@ export const taskControllers = {
         taskRepository
       );
 
-      return res.status(200).json({ message: "Task updated!", taskUpdate });
+      return res.status(200).json({ message: "task updated!", taskUpdate });
     } catch (error) {
       return next(error);
     }
@@ -56,13 +78,13 @@ export const taskControllers = {
       const userID = req.userID;
       const { taskID } = req.params;
 
-      const taskDelete = await taskServices.delete(
+      const taskDeleted = await taskServices.delete(
         taskID,
         userID,
         taskRepository
       );
 
-      return res.status(200).json({ message: "Task deleted!", taskDelete });
+      return res.status(200).json({ message: "task Deleted!", taskDeleted });
     } catch (error) {
       return next(error);
     }

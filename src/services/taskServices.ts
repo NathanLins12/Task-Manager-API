@@ -1,15 +1,20 @@
 import { randomUUID } from "node:crypto";
 import { TaskDataType } from "../validations/taskSchema";
 import { appError } from "../errors/appError";
+import { PaginationDataType } from "../validations/paginationSchema";
 
 export type CreateTaskDataTypes = TaskDataType & { idUser: string };
 export type UpdateTaskDataTypes = TaskDataType & { id_user: string };
+export type UserTasksPagination = PaginationDataType & { userID: string };
 
 export type TaskRepositoryTypes = {
   createTask(data: CreateTaskDataTypes): Promise<{} | undefined>;
   getTask(id: string): Promise<UpdateTaskDataTypes | undefined>;
+  getTasks(
+    data: UserTasksPagination
+  ): Promise<CreateTaskDataTypes[] | undefined>;
   updateTask(data: CreateTaskDataTypes): Promise<{} | undefined>;
-  deleteTask(taskID: string): Promise<{} | undefined>;
+  deleteTask(id: string): Promise<{} | undefined>;
 };
 
 export const taskServices = {
@@ -34,6 +39,26 @@ export const taskServices = {
     }
   },
 
+  async read(data: UserTasksPagination, repository: TaskRepositoryTypes) {
+    try {
+      const { userID, limit, offset, filter } = data;
+      if (!filter || !offset || !limit) {
+        throw appError("please inform limit, offsetand filter", 400);
+      }
+
+      const userTasks = await repository.getTasks({
+        userID,
+        limit,
+        offset,
+        filter,
+      });
+
+      return userTasks;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   async update(
     taskID: string,
     data: CreateTaskDataTypes,
@@ -43,7 +68,7 @@ export const taskServices = {
       const { title, description, date, status, idUser } = data;
 
       const task = {
-        id: randomUUID(),
+        id: taskID,
         title,
         description,
         date,
@@ -52,10 +77,10 @@ export const taskServices = {
       };
 
       const userTask = await repository.getTask(taskID);
-      if (!userTask) throw appError("task not found!", 404);
+      if (!userTask) throw appError("task not found", 404);
 
       if (userTask.id_user != idUser) {
-        throw appError("User not authorized to update task", 404);
+        throw appError("user not authorized to update task", 401);
       }
 
       const taskUpdated = await repository.updateTask(task);
@@ -73,14 +98,14 @@ export const taskServices = {
   ) {
     try {
       const userTask = await repository.getTask(taskID);
-      if (!userTask) throw appError("task not found!", 404);
+      if (!userTask) throw appError("task not found", 404);
 
       if (userTask.id_user != userID) {
-        throw appError("User not authorized to delete task", 401);
+        throw appError("user not authorized to delete task", 401);
       }
 
       const taskDelete = await repository.deleteTask(taskID);
-      if (!taskDelete) throw appError("task not delete!", 500);
+      if (!taskDelete) throw appError("task not deleted!", 500);
 
       return taskDelete;
     } catch (error) {

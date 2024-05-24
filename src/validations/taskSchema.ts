@@ -28,7 +28,7 @@ export const taskSchema = z
     status: z.enum(["pending", "completed"], {
       required_error: "status is required!",
       invalid_type_error: "status must be a 'pending' or 'completed'!",
-      description: "dddd"
+      description: "dddd",
     }),
   })
   .strict();

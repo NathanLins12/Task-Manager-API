@@ -14,8 +14,8 @@ export const authControllers = {
         httpOnly: true,
         sameSite: "none",
         secure: true,
-        maxAge: 1000 * 60 * 60 * 18 // 18h
-      })
+        maxAge: 1000 * 60 * 60 * 18, // 18h
+      });
 
       return res.status(200).json({ message: "User logged in!" });
     } catch (error) {
